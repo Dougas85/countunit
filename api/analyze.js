@@ -15,63 +15,24 @@ export default async function handler(req, res) {
     let body = req.body;
     if (typeof body === "string") body = JSON.parse(body);
 
-    // Converte formato Anthropic → Gemini
-    const systemPrompt = body.system || "";
-    const messages = body.messages || [];
-
-    // Monta contents do Gemini a partir das mensagens
-    const contents = messages.map(msg => {
-      const parts = [];
-      if (Array.isArray(msg.content)) {
-        msg.content.forEach(c => {
-          if (c.type === "text") {
-            parts.push({ text: c.text });
-          } else if (c.type === "image") {
-            parts.push({
-              inline_data: {
-                mime_type: c.source.media_type,
-                data: c.source.data
-              }
-            });
-          }
-        });
-      } else if (typeof msg.content === "string") {
-        parts.push({ text: msg.content });
-      }
-      return {
-        role: msg.role === "assistant" ? "model" : "user",
-        parts
-      };
-    });
-
-    const geminiBody = {
-      system_instruction: systemPrompt ? { parts: [{ text: systemPrompt }] } : undefined,
-      contents,
-      generationConfig: { temperature: 0.1, maxOutputTokens: 500 }
-    };
-
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-    const response = await fetch(geminiUrl, {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(geminiBody)
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify(body)
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("Gemini error:", JSON.stringify(data));
-      return res.status(response.status).json({ error: data.error?.message || "Erro na API Gemini" });
+      console.error("Anthropic error:", JSON.stringify(data));
+      return res.status(response.status).json({ error: data.error?.message || "Erro na API" });
     }
 
-    // Converte resposta Gemini → formato Anthropic (para o frontend não precisar mudar)
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    const anthropicFormat = {
-      content: [{ type: "text", text }]
-    };
-
-    return res.status(200).json(anthropicFormat);
+    return res.status(200).json(data);
 
   } catch (err) {
     console.error("Handler error:", err.message);
