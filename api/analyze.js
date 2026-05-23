@@ -1,7 +1,6 @@
 export const config = { maxDuration: 60 };
 
 export default async function handler(req, res) {
-  // CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -13,7 +12,11 @@ export default async function handler(req, res) {
   if (!apiKey) return res.status(500).json({ error: "API key não configurada no servidor" });
 
   try {
-    const body = req.body;
+    // Parse body manually if needed
+    let body = req.body;
+    if (typeof body === "string") {
+      body = JSON.parse(body);
+    }
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -28,12 +31,14 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     if (!response.ok) {
+      console.error("Anthropic error:", JSON.stringify(data));
       return res.status(response.status).json({ error: data.error?.message || "Erro na API" });
     }
 
     return res.status(200).json(data);
 
   } catch (err) {
+    console.error("Handler error:", err.message);
     return res.status(500).json({ error: "Erro interno: " + err.message });
   }
 }
