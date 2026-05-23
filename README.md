@@ -1,12 +1,12 @@
-# ContaUni — Contador de Objetos Postais
+# CountUnit — Contador de Objetos 
 
-> Aplicação web para estimativa de volume de objetos postais em unidades operacionais dos Correios, utilizando visão computacional via IA.
+> Aplicação web para estimativa de volume de objetos  em unidades operacionais, utilizando visão computacional via IA.
 
 ---
 
 ## 📋 Sobre o projeto
 
-O **ContaUni** foi desenvolvido para otimizar a mensuração de carga em unidades operacionais postais. Por meio de fotos tiradas diretamente pelo celular, o sistema identifica automaticamente os tipos de recipientes presentes na unidade e calcula o volume estimado de objetos com base em uma tabela de gabaritagem.
+O **ContaUni** foi desenvolvido para otimizar a mensuração de carga em unidades operacionais. Por meio de fotos tiradas diretamente pelo celular, o sistema identifica automaticamente os tipos de recipientes presentes na unidade e calcula o volume estimado de objetos com base em uma tabela de gabaritagem.
 
 ---
 
